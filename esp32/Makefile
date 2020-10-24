@@ -1,8 +1,8 @@
 # REQUIREMENTS
 # Export IDF_PATH to the github ESP IDF clone path
-# Esport ESP_FLASH to the github esptool clone path
+# Export ESP_FLASH to the github esptool clone path
 
-PROJECT_NAME := hello-world
+PROJECT_NAME := volume-adjuster
 
 PART_NAME=part_table
 PART_GEN=$(IDF_PATH)/components/partition_table/gen_esp32part.py
@@ -18,30 +18,41 @@ PART_TABLE=0x8000 $(PART_NAME).bin
 # Dont need multiple apps for now
 APP=0x10000 $(PROJECT_NAME).bin
 
+# Multicore builds
+NPROC=$(shell nproc)
+
+.PHONY: all cmake build flashMessage appFLash bootFlash partFlash allFlash genPart clean
+
+all: cmake build genPart
+
+# Redo CMake configuration - make way for new sdkconfig
 cmake: 
 	mkdir -p build
-	cd build && cmake ../ && make
-	rm sdkconfig
+	rm -f sdkconfig
+	cd build && cmake ../ -DPROJECT_NAME=$(PROJECT_NAME)
 
-flashMessage:
-	@echo "\n> When 'Connecting......' appears, a board button may need pressed until the flash starts\n"
-
-appFlash: flashMessage
-	$(FLASH) $(APP)
-
-bootFlash: flashMessage
-	$(FLASH) $(BOOTLOADER)
-
-partFlash: flashMessage
-	$(FLASH) $(PART_TABLE)
-
-allFlash: flashMessage
-	$(FLASH) $(BOOTLOADER) $(PART_TABLE) $(APP)
+build:
+	cd build && make -j $(NPROC)
 
 genPart:
-	$(PART_GEN) $(PART_NAME).csv build/$(PART_NAME).bin	
-
-all: cmake genPart
+	$(PART_GEN) esp_files/$(PART_NAME).csv build/$(PART_NAME).bin	
 
 clean:
-	rm -r build/*
+	rm -rf build/*
+	rm -rf sdkconfig
+
+flashAll: flashMessage
+	$(FLASH) $(BOOTLOADER) $(PART_TABLE) $(APP)
+
+flashMessage:
+	@echo "\n> When 'Connecting...' appears, press the board's button and "
+	@echo "  release when the flash begins\n"
+
+flashApp: flashMessage
+	$(FLASH) $(APP)
+
+flashBoot: flashMessage
+	$(FLASH) $(BOOTLOADER)
+
+flashPart: flashMessage
+	$(FLASH) $(PART_TABLE)

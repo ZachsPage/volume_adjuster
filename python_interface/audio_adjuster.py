@@ -3,14 +3,26 @@ import string
 
 from audio_interface import Audio_Int
 
-# Run and wait for serial input to increase vol
-# Run as constant process
+if __name__ == "__main__":
+    main()
 
-speakers = Audio_Int()
-print( speakers.get_vol() )
+def main():
+    print( "Getting audio interface to manipulate volume for..." )
+    speakers = Audio_Int()
 
-#output = ""
-#ser = serial.Serial("/dev/ttUSB0", 9600, 8, 'N', 1, timeout=1)
-#while output != " ":
-    #output = ser.readline()
-    #print(output)
+    print( "Service started! Listening for ESP32 serial input..." )
+    SERIAL_PORT = "/dev/ttyUSB0"
+    SERIAL_BAUD = 9600
+    SERIAL_BYTE_SIZE = serial.EIGHTBITS
+    SERIAL_PARITY = serial.PARITY_NONE
+    SERIAL_STOPBITS = serial.STOPBITS_ONE
+    SERIAL_TIMEOUT_SECS = None # Blocking
+    serial_port = serial.Serial(SERIAL_PORT, SERIAL_BAUD, SERIAL_BYTE_SIZE,
+                                SERIAL_PARTIY, SERIAL_STOPBITS, SERIAL_TIMEOUT_SECS)
+    while true:
+        output = serial_port.readline()
+        print( "Received serial input... " )
+        for char in output:
+            hex_char = int(char.encode('hex'), 16)
+            print( hex(hex_char), end=' ' )
+        print( "End data\n" )

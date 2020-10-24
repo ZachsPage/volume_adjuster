@@ -1,6 +1,6 @@
 __pycache__/
 
 .vscode/
-esp32/build
+esp32/build/
 esp32/sdkconfig
 esp32/sdkconfig.defaults

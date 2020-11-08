@@ -1,16 +1,11 @@
-import serial
-import string
+from esp32_cmd_handler import MyESP32CmdHandler
+from user_serial import MySerial
 
-from audio_interface import Audio_Int
+''' Sets up bridge between serial port to ESP32 command handler'''
+def main():
+    esp32_serial_handler = MyESP32CmdHandler()
+    my_serial = MySerial(esp32_serial_handler)
+    my_serial.start_serial_listener()
 
-# Run and wait for serial input to increase vol
-# Run as constant process
-
-speakers = Audio_Int()
-print( speakers.get_vol() )
-
-#output = ""
-#ser = serial.Serial("/dev/ttUSB0", 9600, 8, 'N', 1, timeout=1)
-#while output != " ":
-    #output = ser.readline()
-    #print(output)
+if __name__ == "__main__":
+    main()

@@ -2,47 +2,63 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-class Audio_Int:
+''' Class to control the audio interface on Windows '''
+class AudioIntfc:
+    ''' Track last volume for unmute '''
     last_volume = 0
+    ''' Used to get the speakers init '''
     devices = 0
+    ''' Used to get the speakers at init ''' 
     interface = 0
+    ''' The actual speaker object to manipulate '''
     speakers = 0
-
-    def updateVol(self):
-        self.last_volume = self.speakers.GetMasterVolumeLevel()
+    ''' Track if the speakers have been toggled to mute '''
+    muted = False
+    ''' Value to set speakers actual volume to 0 '''
+    ''' - Found with currRange = volume.GetVolumeRange() print currRange [0]''' 
+    MUTE_VALUE = -62
+    ''' Value to set speakers actual volume to 100 '''
+    ''' - Found with currRange = volume.GetVolumeRange() print currRange [1]''' 
+    ''' - Volume of 90 is -1.576, 80 is -3.334, 50 is -10.312, 30 is -17.783...'''
+    MAX_VOL_VALUE = 0
+    ''' Volume adjust per increment/decrement - see doc for MAX_VOL_VALUE '''
+    VOL_OFFSET = 2
 
     def __init__(self):
         self.devices = AudioUtilities.GetSpeakers()
         self.interface = self.devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
         self.speakers = cast(self.interface, POINTER(IAudioEndpointVolume))
-        self.updateVol()
+        self.updateLastVolume()
     
-    def get_vol(self):
+    def getVolume(self):
         return self.speakers.GetMasterVolumeLevel()
-        
-    def inc_vol(self, amount):
-        currVol = self.speakers.GetMasterVolumeLevel()
-        self.speakers.SetMasterVolumeLevel(currVol+(2 * amount), None)
-        self.updateVol()
 
-    def dec_vol(self, amount):
-        currVol = self.speakers.GetMasterVolumeLevel()
-        self.speakers.SetMasterVolumeLevel(currVol-(2 * amount), None)
-        self.updateVol()
+    def updateLastVolume(self):
+        self.last_volume = self.speakers.GetMasterVolumeLevel()
+        
+    def increaseVolume(self):
+        curr_vol = self.speakers.GetMasterVolumeLevel()
+        new_vol = min(curr_vol+self.VOL_OFFSET, self.MAX_VOL_VALUE)
+        self.speakers.SetMasterVolumeLevel(new_vol, None)
+        self.updateLastVolume()
+
+    def decreaseVolume(self):
+        curr_vol = self.speakers.GetMasterVolumeLevel()
+        new_vol = max(curr_vol-self.VOL_OFFSET, self.MUTE_VALUE)
+        self.speakers.SetMasterVolumeLevel(new_vol, None)
+        self.updateLastVolume()
+    
+    def toggleMute(self):
+        if not self.muted:
+            self.mute()
+        else:
+            self.unmute()
 
     def mute(self):
-        currVol = self.speakers.GetMasterVolumeLevel()
-        self.speakers.SetMasterVolumeLevel(-62, None)
+        self.updateLastVolume()
+        self.speakers.SetMasterVolumeLevel(self.MUTE_VALUE, None)
+        self.muted = True
 
     def unmute(self):
         self.speakers.SetMasterVolumeLevel(self.last_volume, None)
-
-    #100 is 0. 
-    # 90 is -1.576469898223877. 
-    # 80 is -3.335562229156494. 
-    # 50 is -10.312137603759766. 
-    # 30 is -17.78333282470703
-    # 0 is -62
-    #currRange = volume.GetVolumeRange()
-    #print(currRange[0]) # 0... -64?
-    #print(currRange[1]) # 100... 0
+        self.muted = False

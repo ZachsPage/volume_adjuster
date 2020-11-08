@@ -1,0 +1,26 @@
+################################################################################
+#
+# NOTE: If this file is changed, run `make clean` before running a `make all`
+#
+# This config method allows overriding the sdkconfigs, but does not run the
+# translation of the config names that are found in sdconfig.rename. So, the
+# configs listed here should match with the names defined on the 'right' column
+# in sdkconfig.rename, not the 'left'
+#
+################################################################################
+
+# Allows all logging prints
+CONFIG_LOG_DEFAULT_LEVEL=0
+
+CONFIG_BT_ENABLED=y
+CONFIG_BTDM_CTRL_MODE_BLE_ONLY=
+CONFIG_BTDM_CTRL_MODE_BR_EDR_ONLY=y
+CONFIG_BTDM_CTRL_MODE_BTDM=
+CONFIG_BT_CLASSIC_ENABLED=y
+CONFIG_BT_SPP_ENABLED=y
+
+#
+# ESP32-specific config
+#
+CONFIG_ESP32_ENABLE_STACK_BT=y
+CONFIG_MEMMAP_BT=y

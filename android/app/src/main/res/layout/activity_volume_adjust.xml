@@ -5,6 +5,10 @@
               android:layout_height="match_parent">
 
     <Button
+            android:text="Connect Bluetooth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/cnct_bt"/>
+    <Button
             android:text="Volume Up"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/btn_vol_up"/>
@@ -16,4 +20,8 @@
             android:text="Mute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/btn_mute"/>
+    <Button
+            android:text="Disconnect Bluetooth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/discnct_bt"/>
 </LinearLayout>

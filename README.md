@@ -5,8 +5,9 @@ an Android phone. The simple way would be directly over the network, but lets
 throw an ESP32 in there for fun.
 
 The flow is an Android application -> SPP Bluetooth -> ESP32 -> Serial -> Python
-* See the top level diagram below
-![Top Level Diagram](images/top_level.png)
+<p align="center" width="100%">
+    <img src="images/top_level.png"> 
+</p>
 
 ## Running
 * Install Android Studio SDK and open the project in `./android`

@@ -3,6 +3,7 @@
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include <atomic>
 
 namespace MyStuff {
 
@@ -46,9 +47,14 @@ public:
 
         //! TODO: Receive task not implemented since its not needed yet
     }
-
+    //! @return True if serial was configured correctly
     bool isConfigd() { return _config_okay; }
+
+    //! @return True serial tasks have been started - may have to sleep before
+    //!   checking as threads take time to spool up
     bool tasksRunning() { return _tasks_running; }
+    
+    //! @param ending_char If called, TX's after every message pulled from Q
     void setEndingChar(char ending_char ) {
         _ending_char = ending_char; 
         _send_ending_char = true;
@@ -64,10 +70,8 @@ private:
 
     void _txTask() {
         _tasks_running = true;
+        constexpr TickType_t MS_TIMEOUT = 1000 / portTICK_PERIOD_MS;
         while( true ) {
-            TickType_t MS_TIMEOUT = 1000 / portTICK_PERIOD_MS;
-
-            //! TODO: Verify queue size >= sizeof(TxMsgT)
             if( xQueueReceive(_tx_q, (void*)&_tx_rcv_buff, MS_TIMEOUT) ) {
                 ESP_LOGI("MySerial", "Forwarding rcv'd msg to serial \n");
                 uart_write_bytes(_uart_num, (const char*)&_tx_rcv_buff,
@@ -82,7 +86,7 @@ private:
     //! Flag to track ctor status
     bool _config_okay {false};
     //! Flag to track starting tasks status
-    bool _tasks_running {false};
+    std::atomic<bool> _tasks_running {false};
 
     //! Queue to store messages to transmit
     QueueHandle_t _tx_q;

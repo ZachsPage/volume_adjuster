@@ -8,9 +8,15 @@ The flow is an Android application -> SPP Bluetooth -> ESP32 -> Serial -> Python
 * See the top level diagram below
 ![Top Level Diagram](images/top_level.png)
 
-## Building
-* Originally, the esp-idf and this project were built using an Ubuntu VM with 
-a shared Windows drive. There was build issues relating to CMake's "configure file" 
-even though the permissions appeared correct. Now, it is suggested to move the
-project's files onto Linux's drive
-* Once setup, build this ESP project using `make all`
+## Running
+* Install Android Studio SDK and open the project in `./android`
+    * Set up developer options to deploy the debug version of the application
+    * Find the newly installed PC_Volume application
+    * See [it's readme](./android/README.md) for some notes
+* Build/flash the ESP32 firmware - see the [ESP Readme](./esp32/README.md)
+* Run the top level python module `./python_interface/audio_adjuster.py`
+    * See [it's readme](./python_interface/README.md) for some installation help
+    * Can also use the AutoHotkey script `./python_interface/LaunchESPCmdHandler.ahk`
+* Use the PC_Volume application to enable Bluetooth and connect to `SPACES_ESP`
+    * Check the Python program for prints indicating a connection
+    * Use the PC_Volume buttons to turn the PC's volume up / down / to mute

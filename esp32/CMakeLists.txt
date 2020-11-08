@@ -6,7 +6,7 @@ if( NOT DEFINED PROJECT_NAME)
 endif()
 
 set(MIN_COMPS bootloader esp32 esptool_py spi_flash cxx)
-set(MY_COMPS MyBluetooth MySerial main)
+set(MY_COMPS MyBluetooth MySerial MyHelpers main)
 set(COMPONENTS ${MIN_COMPS} ${MY_COMPS})
 
 # Use revision controlled file as sdk configuration
